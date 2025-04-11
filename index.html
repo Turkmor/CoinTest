@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coin Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background-color: white;
+      transition: background-color 0.5s;
+    }
+
+    #coinDisplay {
+      position: absolute;
+      top: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    #coinButton {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: gold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    #coinButton.clicked {
+      transform: scale(0.8);
+    }
+
+    #shopToggle {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #555;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    #shopMenu {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      background: white;
+      border: 2px solid #ccc;
+      padding: 10px;
+      border-radius: 12px;
+      display: none;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .shop-item {
+      cursor: pointer;
+      margin: 5px 0;
+      font-size: 1em;
+    }
+
+    .shop-item.purchased {
+      text-decoration: line-through;
+      pointer-events: none;
+      color: gray;
+    }
+
+    #brokeMessage {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2em;
+      color: red;
+      display: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="coinDisplay">coins - 0</div>
+  <div id="coinButton" onclick="gainCoin()">coin</div>
+  <div id="shopToggle" onclick="toggleShop()">🛍️</div>
+  <div id="shopMenu">
+    <div class="shop-item" id="pinkBg" onclick="buyItem('pinkBg', 10, changeBackground)">Pink Background (10 coins)</div>
+  </div>
+  <div id="brokeMessage">YOU'RE BROKE</div>
+
+  <script>
+    let coins = parseInt(localStorage.getItem("coins") || "0");
+    let purchased = JSON.parse(localStorage.getItem("purchased") || '{}');
+    const coinDisplay = document.getElementById("coinDisplay");
+    const coinButton = document.getElementById("coinButton");
+
+    function updateCoinDisplay() {
+      coinDisplay.textContent = `coins - ${coins}`;
+    }
+
+    function gainCoin() {
+      coins++;
+      localStorage.setItem("coins", coins);
+      updateCoinDisplay();
+      coinButton.classList.add("clicked");
+      setTimeout(() => coinButton.classList.remove("clicked"), 200);
+    }
+
+    function toggleShop() {
+      const menu = document.getElementById("shopMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function buyItem(id, cost, onSuccess) {
+      if (purchased[id]) return;
+      if (coins >= cost) {
+        coins -= cost;
+        localStorage.setItem("coins", coins);
+        purchased[id] = true;
+        localStorage.setItem("purchased", JSON.stringify(purchased));
+        document.getElementById(id).classList.add("purchased");
+        updateCoinDisplay();
+        onSuccess();
+      } else {
+        const msg = document.getElementById("brokeMessage");
+        msg.style.display = "block";
+        setTimeout(() => msg.style.display = "none", 2000);
+      }
+    }
+
+    function changeBackground() {
+      document.body.style.backgroundColor = "#fce4ec";
+    }
+
+    // Restore state
+    updateCoinDisplay();
+    if (purchased["pinkBg"]) {
+      document.getElementById("pinkBg").classList.add("purchased");
+      changeBackground();
+    }
+  </script>
+</body>
+</html>
