@@ -24,23 +24,99 @@
       background-image: linear-gradient(to bottom, #f5f0e6 66%, #a0744a 66%, #a0744a);
     }
 
-    .window {
+    .window, .round-window, .plant, .fairylights, .quote-board, .pink-rug, .blue-rug {
+      display: none;
       position: absolute;
+    }
+
+    .window {
       top: 100px;
       left: 40px;
       width: 100px;
       height: 120px;
       background: #cce6ff;
       border: 5px solid #ccc;
-      display: none;
     }
 
-    .window.visible,
-    .plant.visible,
-    .bookshelf.visible,
-    .fairylights.visible {
-      display: block;
+    .round-window {
+      top: 120px;
+      left: 160px;
+      width: 80px;
+      height: 80px;
+      background: #cce6ff;
+      border: 5px solid #999;
+      border-radius: 50%;
     }
+
+    .plant {
+      bottom: 66px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      background: #cc9966;
+    }
+
+    .plant::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 10px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid green;
+    }
+
+    .fairylights {
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 10px;
+      background: radial-gradient(circle, yellow 10%, transparent 10%) repeat-x;
+      background-size: 20px 10px;
+    }
+
+    .quote-board {
+      top: 120px;
+      right: 40px;
+      width: 140px;
+      height: 100px;
+      background: black;
+      border: 4px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Comic Sans MS', cursive;
+      font-size: 12px;
+      color: white;
+      padding: 5px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .quote-board button {
+      margin-top: 5px;
+      font-size: 10px;
+      padding: 2px 6px;
+      background: white;
+      color: black;
+      border: none;
+      cursor: pointer;
+    }
+
+    .pink-rug, .blue-rug {
+      bottom: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 40px;
+    }
+
+    .pink-rug { background: #ffc0cb; }
+    .blue-rug { background: #add8e6; }
 
     #coinDisplay {
       position: absolute;
@@ -85,215 +161,213 @@
       0% { opacity: 1; transform: scale(1) translate(0, 0); }
       100% { opacity: 0; transform: scale(0.5) translate(-30px, -30px); }
     }
-
-    #shopToggle, #resetBtn {
-      position: absolute;
-      bottom: 20px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #555;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.2em;
-      cursor: pointer;
-      z-index: 2;
-    }
-
-    #shopToggle { right: 70px; }
-    #resetBtn { right: 20px; background-color: #a00; }
-
-    #shopMenu {
-      position: absolute;
-      bottom: 80px;
-      right: 20px;
-      background: white;
-      border: 2px solid #ccc;
-      padding: 10px;
-      border-radius: 12px;
-      display: none;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-      z-index: 2;
-    }
-
-    .shop-item {
-      cursor: pointer;
-      margin: 5px 0;
-      font-size: 1em;
-    }
-
-    .shop-item.purchased {
-      text-decoration: line-through;
-      pointer-events: none;
-      color: gray;
-    }
-
-    #brokeMessage {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2em;
-      color: red;
-      display: none;
-      font-weight: bold;
-      z-index: 3;
-    }
-
-    .plant, .bookshelf, .fairylights {
-      position: absolute;
-      display: none;
-    }
-
-    .plant {
-      bottom: 66px;
-      left: 30px;
-      width: 60px;
-      height: 60px;
-      background: green;
-      border-radius: 10px;
-    }
-
-    .bookshelf {
-      bottom: 66px;
-      right: 30px;
-      width: 60px;
-      height: 100px;
-      background: sienna;
-      border-radius: 4px;
-    }
-
-    .fairylights {
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
-      height: 10px;
-      background: radial-gradient(circle, yellow 10%, transparent 10%) repeat-x;
-      background-size: 20px 10px;
-    }
   </style>
 </head>
 <body>
+  <!-- ROOM DECOR -->
   <div class="window" id="window"></div>
+  <div class="round-window" id="roundWindow"></div>
   <div class="plant" id="plant"></div>
-  <div class="bookshelf" id="bookshelf"></div>
   <div class="fairylights" id="fairylights"></div>
+  <div class="pink-rug" id="pinkRug"></div>
+  <div class="blue-rug" id="blueRug"></div>
 
-  <div id="coinDisplay">coins - 0</div>
-  <div id="coinButton" onclick="gainCoin(event)">coin</div>
-  <div id="shopToggle" onclick="toggleShop()">🛍️</div>
-  <div id="resetBtn" onclick="resetAll()">↺</div>
-
-  <div id="shopMenu">
-    <div class="shop-item" id="buyRoom" onclick="buyItem('buyRoom', 100, unlockRoom)">Buy Room (100 coins)</div>
-    <div class="shop-item" id="pinkBg" onclick="buyItem('pinkBg', 10, changeBackground)">Pink Background (10 coins)</div>
-    <div class="shop-item" id="sparkleCursor" onclick="buyItem('sparkleCursor', 15, enableSparkleCursor)">Sparkle Cursor (15 coins)</div>
-    <div class="shop-item" id="plantDecor" onclick="buyItem('plantDecor', 20, () => addDecor('plant'))">Potted Plant (20 coins)</div>
-    <div class="shop-item" id="bookshelfDecor" onclick="buyItem('bookshelfDecor', 30, () => addDecor('bookshelf'))">Bookshelf (30 coins)</div>
-    <div class="shop-item" id="fairyDecor" onclick="buyItem('fairyDecor', 25, () => addDecor('fairylights'))">Fairy Lights (25 coins)</div>
+  <!-- QUOTE BOARD -->
+  <div class="quote-board" id="quoteBoard" style="display:none;">
+    <div id="quoteText">"Be the light."</div>
+    <button onclick="rerollQuote()">↻</button>
   </div>
 
-  <div id="brokeMessage">YOU'RE BROKE</div>
+  <!-- COIN COUNTER + BUTTON -->
+  <div id="coinDisplay">coins - 0</div>
+  <div id="coinButton" onclick="gainCoin(event)">coin</div>
 
-  <script>
-    let coins = parseInt(localStorage.getItem("coins") || "0");
-    let purchased = JSON.parse(localStorage.getItem("purchased") || '{}');
+  <!-- SHOP BUTTONS -->
+  <div id="shopRoomBtn" style="position:absolute; bottom:20px; right:120px;" onclick="toggleShop('room')">🏠</div>
+  <div id="shopCursorBtn" style="position:absolute; bottom:20px; right:70px;" onclick="toggleShop('cursor')">🖱️</div>
+  <div id="resetBtn" style="position:absolute; bottom:20px; right:20px; background:#a00;" onclick="resetAll()">↺</div>
 
-    const coinDisplay = document.getElementById("coinDisplay");
-    const coinButton = document.getElementById("coinButton");
+  <!-- SHOP MENUS -->
+  <div id="shopMenuRoom" class="shopMenu">
+    <div class="shop-item" id="buyRoom" onclick="buyItem('buyRoom', 100, unlockRoom)">Buy Room (100 coins)</div>
+    <!-- All other room items will only be shown once room is purchased -->
+    <div id="roomExtras" style="display:none;">
+      <div class="shop-item" onclick="selectWallColor('pink')">Pink Wall</div>
+      <div class="shop-item" onclick="selectWallColor('blue')">Blue Wall</div>
+      <div class="shop-item" onclick="selectWallColor('striped')">Striped Wall</div>
+      <div class="shop-item" onclick="buyItem('roundWindow', 30, () => showElement('roundWindow'))">Round Window (30 coins)</div>
+      <div class="shop-item" onclick="buyItem('biggerWindow', 25, () => resizeElement('window'))">Bigger Window (25 coins)</div>
+      <div class="shop-item" onclick="buyItem('plantDecor', 20, () => showElement('plant'))">Potted Plant (20 coins)</div>
+      <div class="shop-item" onclick="buyItem('fairylights', 25, () => showElement('fairylights'))">Fairy Lights (25 coins)</div>
+      <div class="shop-item" onclick="buyItem('quoteBoard', 30, () => showElement('quoteBoard'))">Quote Board (30 coins)</div>
+      <div class="shop-item" onclick="selectRug('pink')">Pink Rug</div>
+      <div class="shop-item" onclick="selectRug('blue')">Blue Rug</div>
+    </div>
+  </div>
 
-    function updateCoinDisplay() {
-      coinDisplay.textContent = `coins - ${coins}`;
-    }
+  <div id="shopMenuCursor" class="shopMenu">
+    <div class="shop-item" onclick="buyItem('sparkleCursor', 15, enableSparkleCursor)">Sparkle Cursor (15 coins)</div>
+    <div class="shop-item" onclick="setSparkleColor('pink')">Pink Sparkles</div>
+    <div class="shop-item" onclick="setSparkleColor('blue')">Blue Sparkles</div>
+    <div class="shop-item" onclick="setSparkleColor('gold')">Gold Sparkles</div>
+    <div class="shop-item" onclick="buyItem('bigSparkles', 20, () => sparkleSize = 12)">Bigger Sparkles (20 coins)</div>
+  </div>
+<script>
+  let coins = parseInt(localStorage.getItem("coins") || "0");
+  let purchased = JSON.parse(localStorage.getItem("purchased") || '{}');
+  let sparkleColor = localStorage.getItem("sparkleColor") || "white";
+  let sparkleSize = parseInt(localStorage.getItem("sparkleSize") || "6");
 
-    function gainCoin(event) {
-      coins++;
-      localStorage.setItem("coins", coins);
-      updateCoinDisplay();
-      coinButton.classList.add("clicked");
-      createParticles(event);
-      setTimeout(() => coinButton.classList.remove("clicked"), 200);
-    }
+  const quotes = [
+    "Be the light.",
+    "One step at a time.",
+    "You are enough.",
+    "Progress, not perfection.",
+    "Shine quietly.",
+    "You’ve got this.",
+    "Grow slow, bloom strong.",
+    "Feel it, then keep going.",
+    "Joy is rebellion.",
+    "Rest is productive."
+  ];
 
-    function toggleShop() {
-      const menu = document.getElementById("shopMenu");
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
+  function updateCoinDisplay() {
+    document.getElementById("coinDisplay").textContent = `coins - ${coins}`;
+  }
 
-    function buyItem(id, cost, onSuccess) {
-      if (purchased[id]) return;
-      if (coins >= cost) {
-        coins -= cost;
-        localStorage.setItem("coins", coins);
-        purchased[id] = true;
-        localStorage.setItem("purchased", JSON.stringify(purchased));
-        document.getElementById(id).classList.add("purchased");
-        updateCoinDisplay();
-        onSuccess();
-      } else {
-        const msg = document.getElementById("brokeMessage");
-        msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 2000);
-      }
-    }
-
-    function changeBackground() {
-      document.body.style.backgroundColor = "#fce4ec";
-    }
-
-    function enableSparkleCursor() {
-      document.addEventListener('mousemove', sparkleEffect);
-    }
-
-    function sparkleEffect(e) {
-      const sparkle = document.createElement('div');
-      sparkle.className = 'sparkle';
-      sparkle.style.left = `${e.pageX}px`;
-      sparkle.style.top = `${e.pageY}px`;
-      document.body.appendChild(sparkle);
-      setTimeout(() => sparkle.remove(), 1000);
-    }
-
-    function createParticles(e) {
-      for (let i = 0; i < 5; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = `${coinButton.offsetWidth/2 + (Math.random() * 30 - 15)}px`;
-        p.style.top = `${coinButton.offsetHeight/2 + (Math.random() * 30 - 15)}px`;
-        coinButton.appendChild(p);
-        setTimeout(() => p.remove(), 500);
-      }
-    }
-
-    function unlockRoom() {
-      document.body.classList.add("room");
-      document.getElementById("window").classList.add("visible");
-    }
-
-    function addDecor(id) {
-      document.getElementById(id).classList.add("visible");
-    }
-
-    function resetAll() {
-      localStorage.clear();
-      location.reload();
-    }
-
+  function gainCoin(event) {
+    coins++;
+    localStorage.setItem("coins", coins);
     updateCoinDisplay();
-    for (const key in purchased) {
-      if (purchased[key]) {
-        const el = document.getElementById(key);
-        if (el) el.classList.add("purchased");
-        if (key === 'pinkBg') changeBackground();
-        if (key === 'sparkleCursor') enableSparkleCursor();
-        if (key === 'buyRoom') unlockRoom();
-        if (key === 'plantDecor') addDecor('plant');
-        if (key === 'bookshelfDecor') addDecor('bookshelf');
-        if (key === 'fairyDecor') addDecor('fairylights');
+    animateCoin(event);
+  }
+
+  function animateCoin(e) {
+    const btn = document.getElementById("coinButton");
+    btn.classList.add("clicked");
+    for (let i = 0; i < 5; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = `${btn.offsetWidth / 2 + (Math.random() * 30 - 15)}px`;
+      p.style.top = `${btn.offsetHeight / 2 + (Math.random() * 30 - 15)}px`;
+      btn.appendChild(p);
+      setTimeout(() => p.remove(), 500);
+    }
+    setTimeout(() => btn.classList.remove("clicked"), 200);
+  }
+
+  function toggleShop(type) {
+    document.getElementById("shopMenuRoom").style.display = type === "room" ? "block" : "none";
+    document.getElementById("shopMenuCursor").style.display = type === "cursor" ? "block" : "none";
+  }
+
+  function buyItem(id, cost, onSuccess) {
+    if (purchased[id]) return;
+    if (coins >= cost) {
+      coins -= cost;
+      purchased[id] = true;
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("purchased", JSON.stringify(purchased));
+      updateCoinDisplay();
+      if (onSuccess) onSuccess();
+      showUnlockedItems();
+    } else {
+      alert("YOU'RE BROKE");
+    }
+  }
+
+  function unlockRoom() {
+    document.body.classList.add("room");
+    showElement("window");
+    showUnlockedItems();
+  }
+
+  function showUnlockedItems() {
+    if (purchased["buyRoom"]) {
+      document.getElementById("roomExtras").style.display = "block";
+      for (let id in purchased) {
+        if (purchased[id]) {
+          const el = document.getElementById(id);
+          if (el && el.classList.contains("shop-item")) {
+            el.classList.add("purchased");
+          }
+        }
       }
     }
-  </script>
+  }
+
+  function showElement(id) {
+    document.getElementById(id).style.display = "block";
+  }
+
+  function resizeElement(id) {
+    const el = document.getElementById(id);
+    el.style.width = "140px";
+    el.style.height = "160px";
+  }
+
+  function rerollQuote() {
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById("quoteText").textContent = `"${quote}"`;
+  }
+
+  function selectWallColor(color) {
+    const body = document.body;
+    if (color === "pink") {
+      body.style.backgroundImage = "linear-gradient(to bottom, #ffe4e1 66%, #a0744a 66%, #a0744a)";
+    } else if (color === "blue") {
+      body.style.backgroundImage = "linear-gradient(to bottom, #e0f7ff 66%, #a0744a 66%, #a0744a)";
+    } else if (color === "striped") {
+      body.style.backgroundImage = "repeating-linear-gradient(to bottom, #fff 0px, #fff 20px, #f0f0f0 20px, #f0f0f0 40px), linear-gradient(to bottom, #f5f0e6 66%, #a0744a 66%, #a0744a)";
+    }
+  }
+
+  function selectRug(color) {
+    document.getElementById("pinkRug").style.display = "none";
+    document.getElementById("blueRug").style.display = "none";
+    if (color === "pink") document.getElementById("pinkRug").style.display = "block";
+    if (color === "blue") document.getElementById("blueRug").style.display = "block";
+  }
+
+  function enableSparkleCursor() {
+    document.addEventListener("mousemove", sparkleEffect);
+  }
+
+  function setSparkleColor(color) {
+    sparkleColor = color;
+    localStorage.setItem("sparkleColor", color);
+  }
+
+  function sparkleEffect(e) {
+    const sparkle = document.createElement("div");
+    sparkle.className = "sparkle";
+    sparkle.style.left = `${e.pageX}px`;
+    sparkle.style.top = `${e.pageY}px`;
+    sparkle.style.background = sparkleColor;
+    sparkle.style.position = "fixed";
+    sparkle.style.pointerEvents = "none";
+    sparkle.style.width = `${sparkleSize}px`;
+    sparkle.style.height = `${sparkleSize}px`;
+    sparkle.style.borderRadius = "50%";
+    sparkle.style.animation = "sparkle-fade 1s ease-out forwards";
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 1000);
+  }
+
+  function resetAll() {
+    localStorage.clear();
+    location.reload();
+  }
+
+  updateCoinDisplay();
+  if (purchased["buyRoom"]) unlockRoom();
+  if (purchased["sparkleCursor"]) enableSparkleCursor();
+  if (purchased["quoteBoard"]) showElement("quoteBoard");
+  if (purchased["fairylights"]) showElement("fairylights");
+  if (purchased["plantDecor"]) showElement("plant");
+  if (purchased["roundWindow"]) showElement("roundWindow");
+  if (purchased["biggerWindow"]) resizeElement("window");
+  showUnlockedItems();
+</script>
 </body>
 </html>
