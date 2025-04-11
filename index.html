@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coin Test</title>
+  <title>Coin Room</title>
   <style>
     body {
       margin: 0;
@@ -35,7 +35,10 @@
       display: none;
     }
 
-    .window.visible {
+    .window.visible,
+    .plant.visible,
+    .bookshelf.visible,
+    .fairylights.visible {
       display: block;
     }
 
@@ -83,10 +86,9 @@
       100% { opacity: 0; transform: scale(0.5) translate(-30px, -30px); }
     }
 
-    #shopToggle {
+    #shopToggle, #resetBtn {
       position: absolute;
       bottom: 20px;
-      right: 20px;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -99,6 +101,9 @@
       cursor: pointer;
       z-index: 2;
     }
+
+    #shopToggle { right: 70px; }
+    #resetBtn { right: 20px; background-color: #a00; }
 
     #shopMenu {
       position: absolute;
@@ -136,37 +141,66 @@
       z-index: 3;
     }
 
-    .sparkle {
-      position: fixed;
-      pointer-events: none;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.7);
-      animation: sparkle-fade 1s ease-out forwards;
+    .plant, .bookshelf, .fairylights {
+      position: absolute;
+      display: none;
     }
 
-    @keyframes sparkle-fade {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0); opacity: 0; }
+    .plant {
+      bottom: 66px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      background: green;
+      border-radius: 10px;
+    }
+
+    .bookshelf {
+      bottom: 66px;
+      right: 30px;
+      width: 60px;
+      height: 100px;
+      background: sienna;
+      border-radius: 4px;
+    }
+
+    .fairylights {
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 10px;
+      background: radial-gradient(circle, yellow 10%, transparent 10%) repeat-x;
+      background-size: 20px 10px;
     }
   </style>
 </head>
 <body>
   <div class="window" id="window"></div>
+  <div class="plant" id="plant"></div>
+  <div class="bookshelf" id="bookshelf"></div>
+  <div class="fairylights" id="fairylights"></div>
+
   <div id="coinDisplay">coins - 0</div>
   <div id="coinButton" onclick="gainCoin(event)">coin</div>
   <div id="shopToggle" onclick="toggleShop()">🛍️</div>
+  <div id="resetBtn" onclick="resetAll()">↺</div>
+
   <div id="shopMenu">
     <div class="shop-item" id="buyRoom" onclick="buyItem('buyRoom', 100, unlockRoom)">Buy Room (100 coins)</div>
     <div class="shop-item" id="pinkBg" onclick="buyItem('pinkBg', 10, changeBackground)">Pink Background (10 coins)</div>
     <div class="shop-item" id="sparkleCursor" onclick="buyItem('sparkleCursor', 15, enableSparkleCursor)">Sparkle Cursor (15 coins)</div>
+    <div class="shop-item" id="plantDecor" onclick="buyItem('plantDecor', 20, () => addDecor('plant'))">Potted Plant (20 coins)</div>
+    <div class="shop-item" id="bookshelfDecor" onclick="buyItem('bookshelfDecor', 30, () => addDecor('bookshelf'))">Bookshelf (30 coins)</div>
+    <div class="shop-item" id="fairyDecor" onclick="buyItem('fairyDecor', 25, () => addDecor('fairylights'))">Fairy Lights (25 coins)</div>
   </div>
+
   <div id="brokeMessage">YOU'RE BROKE</div>
 
   <script>
     let coins = parseInt(localStorage.getItem("coins") || "0");
     let purchased = JSON.parse(localStorage.getItem("purchased") || '{}');
+
     const coinDisplay = document.getElementById("coinDisplay");
     const coinButton = document.getElementById("coinButton");
 
@@ -238,7 +272,15 @@
       document.getElementById("window").classList.add("visible");
     }
 
-    // Restore purchases and apply
+    function addDecor(id) {
+      document.getElementById(id).classList.add("visible");
+    }
+
+    function resetAll() {
+      localStorage.clear();
+      location.reload();
+    }
+
     updateCoinDisplay();
     for (const key in purchased) {
       if (purchased[key]) {
@@ -247,6 +289,9 @@
         if (key === 'pinkBg') changeBackground();
         if (key === 'sparkleCursor') enableSparkleCursor();
         if (key === 'buyRoom') unlockRoom();
+        if (key === 'plantDecor') addDecor('plant');
+        if (key === 'bookshelfDecor') addDecor('bookshelf');
+        if (key === 'fairyDecor') addDecor('fairylights');
       }
     }
   </script>
