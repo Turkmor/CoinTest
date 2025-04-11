@@ -29,6 +29,19 @@
       position: absolute;
     }
 
+    .shopMenu {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      background: white;
+      border: 2px solid #ccc;
+      padding: 10px;
+      border-radius: 12px;
+      display: none;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+    }  
+    
     .window {
       top: 100px;
       left: 40px;
@@ -97,6 +110,20 @@
       text-align: center;
     }
 
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: absolute;
+    }
+    
     .quote-board button {
       margin-top: 5px;
       font-size: 10px;
@@ -182,10 +209,10 @@
   <div id="coinDisplay">coins - 0</div>
   <div id="coinButton" onclick="gainCoin(event)">coin</div>
 
-  <!-- SHOP BUTTONS -->
-  <div id="shopRoomBtn" style="position:absolute; bottom:20px; right:120px;" onclick="toggleShop('room')">🏠</div>
-  <div id="shopCursorBtn" style="position:absolute; bottom:20px; right:70px;" onclick="toggleShop('cursor')">🖱️</div>
-  <div id="resetBtn" style="position:absolute; bottom:20px; right:20px; background:#a00;" onclick="resetAll()">↺</div>
+    <!-- SHOP BUTTONS with cute circle style -->
+  <div id="shopRoomBtn" class="icon-button" style="bottom:20px; right:120px;" onclick="toggleShop('room')">🏠</div>
+  <div id="shopCursorBtn" class="icon-button" style="bottom:20px; right:70px;" onclick="toggleShop('cursor')">🖰</div>
+  <div id="resetBtn" class="icon-button" style="bottom:20px; right:20px; background:#a00;" onclick="resetAll()">↺</div>
 
   <!-- SHOP MENUS -->
   <div id="shopMenuRoom" class="shopMenu">
@@ -256,10 +283,20 @@
     setTimeout(() => btn.classList.remove("clicked"), 200);
   }
 
-  function toggleShop(type) {
-    document.getElementById("shopMenuRoom").style.display = type === "room" ? "block" : "none";
-    document.getElementById("shopMenuCursor").style.display = type === "cursor" ? "block" : "none";
+ function toggleShop(type) {
+  const roomMenu = document.getElementById("shopMenuRoom");
+  const cursorMenu = document.getElementById("shopMenuCursor");
+
+  if (type === "room") {
+    const isOpen = roomMenu.style.display === "block";
+    roomMenu.style.display = isOpen ? "none" : "block";
+    cursorMenu.style.display = "none";
+  } else if (type === "cursor") {
+    const isOpen = cursorMenu.style.display === "block";
+    cursorMenu.style.display = isOpen ? "none" : "block";
+    roomMenu.style.display = "none";
   }
+}
 
   function buyItem(id, cost, onSuccess) {
     if (purchased[id]) return;
