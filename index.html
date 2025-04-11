@@ -16,6 +16,27 @@
       flex-direction: column;
       background-color: white;
       transition: background-color 0.5s;
+      overflow: hidden;
+    }
+
+    body.room {
+      background-color: #f5f0e6;
+      background-image: linear-gradient(to bottom, #f5f0e6 66%, #a0744a 66%, #a0744a);
+    }
+
+    .window {
+      position: absolute;
+      top: 100px;
+      left: 40px;
+      width: 100px;
+      height: 120px;
+      background: #cce6ff;
+      border: 5px solid #ccc;
+      display: none;
+    }
+
+    .window.visible {
+      display: block;
     }
 
     #coinDisplay {
@@ -38,10 +59,28 @@
       cursor: pointer;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       transition: transform 0.2s;
+      position: relative;
+      overflow: visible;
+      z-index: 1;
     }
 
     #coinButton.clicked {
       transform: scale(0.8);
+    }
+
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: gold;
+      border-radius: 50%;
+      animation: pop 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes pop {
+      0% { opacity: 1; transform: scale(1) translate(0, 0); }
+      100% { opacity: 0; transform: scale(0.5) translate(-30px, -30px); }
     }
 
     #shopToggle {
@@ -58,6 +97,7 @@
       align-items: center;
       font-size: 1.2em;
       cursor: pointer;
+      z-index: 2;
     }
 
     #shopMenu {
@@ -70,6 +110,7 @@
       border-radius: 12px;
       display: none;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      z-index: 2;
     }
 
     .shop-item {
@@ -92,15 +133,34 @@
       color: red;
       display: none;
       font-weight: bold;
+      z-index: 3;
+    }
+
+    .sparkle {
+      position: fixed;
+      pointer-events: none;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      animation: sparkle-fade 1s ease-out forwards;
+    }
+
+    @keyframes sparkle-fade {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
     }
   </style>
 </head>
 <body>
+  <div class="window" id="window"></div>
   <div id="coinDisplay">coins - 0</div>
-  <div id="coinButton" onclick="gainCoin()">coin</div>
+  <div id="coinButton" onclick="gainCoin(event)">coin</div>
   <div id="shopToggle" onclick="toggleShop()">🛍️</div>
   <div id="shopMenu">
+    <div class="shop-item" id="buyRoom" onclick="buyItem('buyRoom', 100, unlockRoom)">Buy Room (100 coins)</div>
     <div class="shop-item" id="pinkBg" onclick="buyItem('pinkBg', 10, changeBackground)">Pink Background (10 coins)</div>
+    <div class="shop-item" id="sparkleCursor" onclick="buyItem('sparkleCursor', 15, enableSparkleCursor)">Sparkle Cursor (15 coins)</div>
   </div>
   <div id="brokeMessage">YOU'RE BROKE</div>
 
@@ -114,11 +174,12 @@
       coinDisplay.textContent = `coins - ${coins}`;
     }
 
-    function gainCoin() {
+    function gainCoin(event) {
       coins++;
       localStorage.setItem("coins", coins);
       updateCoinDisplay();
       coinButton.classList.add("clicked");
+      createParticles(event);
       setTimeout(() => coinButton.classList.remove("clicked"), 200);
     }
 
@@ -148,11 +209,45 @@
       document.body.style.backgroundColor = "#fce4ec";
     }
 
-    // Restore state
+    function enableSparkleCursor() {
+      document.addEventListener('mousemove', sparkleEffect);
+    }
+
+    function sparkleEffect(e) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = `${e.pageX}px`;
+      sparkle.style.top = `${e.pageY}px`;
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 1000);
+    }
+
+    function createParticles(e) {
+      for (let i = 0; i < 5; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = `${coinButton.offsetWidth/2 + (Math.random() * 30 - 15)}px`;
+        p.style.top = `${coinButton.offsetHeight/2 + (Math.random() * 30 - 15)}px`;
+        coinButton.appendChild(p);
+        setTimeout(() => p.remove(), 500);
+      }
+    }
+
+    function unlockRoom() {
+      document.body.classList.add("room");
+      document.getElementById("window").classList.add("visible");
+    }
+
+    // Restore purchases and apply
     updateCoinDisplay();
-    if (purchased["pinkBg"]) {
-      document.getElementById("pinkBg").classList.add("purchased");
-      changeBackground();
+    for (const key in purchased) {
+      if (purchased[key]) {
+        const el = document.getElementById(key);
+        if (el) el.classList.add("purchased");
+        if (key === 'pinkBg') changeBackground();
+        if (key === 'sparkleCursor') enableSparkleCursor();
+        if (key === 'buyRoom') unlockRoom();
+      }
     }
   </script>
 </body>
