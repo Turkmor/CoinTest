@@ -41,6 +41,12 @@
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
       z-index: 2;
     }  
+
+    .shop-item.purchased {
+      text-decoration: line-through;
+      pointer-events: none;
+      color: gray;
+    }
     
     .window {
       top: 100px;
@@ -305,6 +311,7 @@
       purchased[id] = true;
       localStorage.setItem("coins", coins);
       localStorage.setItem("purchased", JSON.stringify(purchased));
+      document.getElementById(id).classList.add("purchased");
       updateCoinDisplay();
       if (onSuccess) onSuccess();
       showUnlockedItems();
@@ -397,14 +404,31 @@
   }
 
   updateCoinDisplay();
-  if (purchased["buyRoom"]) unlockRoom();
-  if (purchased["sparkleCursor"]) enableSparkleCursor();
-  if (purchased["quoteBoard"]) showElement("quoteBoard");
-  if (purchased["fairylights"]) showElement("fairylights");
-  if (purchased["plantDecor"]) showElement("plant");
-  if (purchased["roundWindow"]) showElement("roundWindow");
-  if (purchased["biggerWindow"]) resizeElement("window");
-  showUnlockedItems();
+if (purchased["buyRoom"]) unlockRoom();
+if (purchased["sparkleCursor"]) enableSparkleCursor();
+if (purchased["quoteBoard"]) showElement("quoteBoard");
+if (purchased["fairylights"]) showElement("fairylights");
+if (purchased["plantDecor"]) showElement("plant");
+if (purchased["roundWindow"]) showElement("roundWindow");
+if (purchased["biggerWindow"]) resizeElement("window");
+showUnlockedItems();
+
+// ⬇️ SKIP THESE WHEN DOING STRIKETHROUGH
+const skipStrikethrough = [
+  "pinkRug", "blueRug",
+  "pinkWall", "blueWall", "stripedWall",
+  "pinkSparkles", "blueSparkles", "goldSparkles"
+];
+
+for (const key in purchased) {
+  if (purchased[key] && !skipStrikethrough.includes(key)) {
+    const el = document.getElementById(key);
+    if (el) {
+      el.classList.add("purchased");
+    }
+  }
+}
+}
 </script>
 </body>
 </html>
